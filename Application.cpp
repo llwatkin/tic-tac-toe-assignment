@@ -1,11 +1,13 @@
 #include "Application.h"
 #include "imgui/imgui.h"
 #include "classes/TicTacToe.h"
+#include "classes/Logger.h"
 
 namespace ClassGame {
         //
         // our global variables
         //
+        Logger& logger = Logger::GetInstance();
         TicTacToe *game = nullptr;
         bool gameOver = false;
         int gameWinner = -1;
@@ -18,6 +20,7 @@ namespace ClassGame {
         {
             game = new TicTacToe();
             game->setUpBoard();
+            logger.Info("Game started");
         }
 
         //
@@ -28,7 +31,15 @@ namespace ClassGame {
         {
                 ImGui::DockSpaceOverViewport();
 
-                //ImGui::ShowDemoWindow();
+                // Debug window
+                ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_FirstUseEver);
+                ImGui::Begin("Debug Log");
+                if (ImGui::Button("Save")) logger.ToFile();
+                ImGui::SameLine();
+                if (ImGui::Button("Clear")) logger.Clear();
+                // Draw all log messages
+                logger.Draw("Debug Log");
+                ImGui::End();
 
                 if (!game) return;
                 if (!game->getCurrentPlayer()) return;
@@ -49,7 +60,8 @@ namespace ClassGame {
                 }
                 ImGui::End();
 
-                ImGui::Begin("GameWindow");
+                ImGui::SetNextWindowSize(ImVec2(350, 350));
+                ImGui::Begin("GameWindow", nullptr, ImGuiWindowFlags_NoResize);
                 game->drawFrame();
                 ImGui::End();
         }

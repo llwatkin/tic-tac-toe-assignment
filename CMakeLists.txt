@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.10)
 project(tictactoe VERSION 0.1.0 LANGUAGES C CXX)
 
 # check for macOS
@@ -59,6 +59,7 @@ add_executable(demo Application.cpp
                           classes/Sprite.cpp
                           classes/Square.cpp
                           classes/TicTacToe.cpp
+                          classes/Logger.cpp
                           ${BCKD_FILE}
                           ${MAIN_FILE}
                           ${IMPL_FILE}
