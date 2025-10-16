@@ -29,6 +29,7 @@
 //const int HUMAN_PLAYER= 0;      // index of the human player (X)
 
 Logger &logger = Logger::GetInstance();
+bool gameOver = false;
 
 TicTacToe::TicTacToe()
 {
@@ -80,6 +81,9 @@ void TicTacToe::setUpBoard()
 //
 bool TicTacToe::actionForEmptyHolder(BitHolder *holder)
 {
+    // If the game is over, don't allow placement of new pieces
+    if (gameOver) return false;
+
     // 1) Guard clause: if holder is nullptr, fail fast.
     //    (Beginner hint: always check pointers before using them.)
     //    if (!holder) return false;
@@ -130,6 +134,7 @@ void TicTacToe::stopGame()
             _grid[rowX][rowY].destroyBit();
         }
     }
+    gameOver = false; // Reset the gameOver bool so we can play a new game
 }
 
 //
@@ -161,37 +166,23 @@ Player* TicTacToe::checkForWinner()
     // 0,4,8
     // 2,4,6
     int triples[8][3] = { {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6} };
+
     // you can use the ownerAt helper function to get the owner of a square
     // for example, ownerAt(0) returns the owner of the top-left square
     // if there is no bit in that square, it returns nullptr
-    // if you find a winning triple, return the player who owns that triple
-    // otherwise return nullptr
-    // Hint: Consider using an array to store the winning combinations
-    // to avoid repetitive code
-
-    // Instead, I'm going to get the game state and use that to check
-    // There are four situations in which a player wins:
-    // 1) X X X [] [] [] [] [] [] <- The same player appears in three bits, next to each other (a vertical win)
-    // 2) X [] [] X [] [] X [] [] <- The same player appears in three bits, two bits apart (a horizontal win)
-    // 3) X [] [] [] X [] [] [] X <- The same player appears in three bits, three bits apart (downward diagonal win)
-    // 4) [] [] X [] X [] [] [] X <- The same player appears in three bits, irregular spacing (upward diagonal win)
-    // The winning states of each of these situations are represented by the triples above
-    std::string gameState = stateString();
-    // So, for each triple, I need to check if the gameState's values at those indicies are all the same player
-    // If they are, return the player
-    logger.Info("Checking if a player won");
-    for (int i = 0; i < 8; i++)
-    {
-        if (gameState[triples[i][0]] != '0' && gameState[triples[i][1]] != '0' && gameState[triples[i][2]] != '0') 
-        {
-            if (gameState[triples[i][0]] == gameState[triples[i][1]] && gameState[triples[i][1]] == gameState[triples[i][2]] != 0)
-            {
-                logger.Event("A player won the game!");
-                int playerNumber = gameState[triples[i][0]] == '1' ? 1 : 0;
-                return getPlayerAt(playerNumber);
-            }
+    for (int i = 0; i < 8; i++) {
+        Player *owner1 = ownerAt(triples[i][0]);
+        Player *owner2 = ownerAt(triples[i][1]);
+        Player *owner3 = ownerAt(triples[i][2]);
+        if ((owner1 && owner2 && owner3) && (owner1 == owner2 && owner2 == owner3)) {
+            // if you find a winning triple, return the player who owns that triple
+            logger.Event("Player " + std::to_string(owner1->playerNumber()) + " won the game");
+            gameOver = true;
+            return owner1;
         }
     }
+    
+    // otherwise return nullptr
     return nullptr;
 }
 
@@ -207,6 +198,7 @@ bool TicTacToe::checkForDraw()
             if (!_grid[rowX][rowY].bit()) return false;
         }
     }
+    logger.Event("The game ended in a draw");
     return true;
 }
 
