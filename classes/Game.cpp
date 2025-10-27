@@ -6,6 +6,7 @@
 
 Game::Game()
 {
+	_gameOptions.gameOver = false;
 	_gameOptions.AIPlayer = false;
 	_gameOptions.AIPlaying = false;
 	_gameOptions.currentTurnNo = 0;
@@ -93,11 +94,11 @@ void Game::endTurn()
 
 void Game::scanForMouse()
 {
-    //if (gameHasAI() && getCurrentPlayer()->isAIPlayer()) 
-    //{
-    //    updateAI();
-    //    return;
-    //}
+    if (gameHasAI() && getCurrentPlayer()->isAIPlayer()) 
+    {
+        updateAI();
+        return;
+    }
 
     ImVec2 mousePos = ImGui::GetMousePos();
     mousePos.x -= ImGui::GetWindowPos().x;

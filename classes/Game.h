@@ -13,6 +13,7 @@ class GameTable;
 
 struct GameOptions
 {
+	bool gameOver;
 	bool AIPlaying;
 	int numberOfPlayers;
 	int AIPlayer;
