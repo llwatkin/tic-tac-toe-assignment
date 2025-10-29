@@ -331,7 +331,7 @@ std::string TicTacToe::getBestMove()
 
     for (auto const & move : moves) 
     {
-        int evaluation = -negamax(move, 3, HUMAN_PLAYER);
+        int evaluation = -negamax(move, 9, HUMAN_PLAYER);
         logger.Info("Checking move: " + move + " Evaluation: " + std::to_string(evaluation));
         if (evaluation > bestEvaluation) 
         {
